@@ -1,0 +1,52 @@
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+#ifndef ONLINE_JUDGE
+#define dbg(x...) do{cout << "\033[33;1m" << #x << "->" ; err(x);} while(0)
+void err(){cout << "\033[39;0m" << endl;}
+template<template<typename...> class T,typename t,typename... A>
+void err(T<t> a,A... x){for (auto v:a) cout << v << ' '; err(x...);}
+template<typename T,typename... A>
+void err(T a,A... x){cout << a << ' '; err(x...);}
+#else
+#define dbg(...)
+#endif
+const int maxn=55;
+const int mod=998244353;
+int prefer[maxn];
+ll w[maxn][maxn];
+ll quick(ll a,ll b)
+{
+	ll ret=1;
+	while(b)
+	{
+		if(b&1) ret=ret*a%mod;
+		a=a*a%mod;
+		b>>=1;
+	}
+	return ret;
+}
+ll inv(ll a) {return quick(a,mod-2);}
+int main()
+{
+	int n,m;
+	scanf("%d%d",&n,&m);
+	for(int i=1;i<=n;i++) scanf("%d",&prefer[i]);
+	for(int i=1;i<=n;i++) scanf("%lld",&w[0][i]);
+	for(int i=1;i<=m;i++)
+	{
+		ll sum=0;
+		for(int j=1;j<=n;j++)
+			sum=(sum+w[i-1][j])%mod;
+		for(int j=1;j<=n;j++)
+		{
+			ll rate=w[i-1][j]*inv(sum)%mod;
+			if(prefer[j]) w[i][j]=(w[i-1][j]+rate)%mod;
+			else w[i][j]=(w[i-1][j]-rate+mod)%mod;
+		}
+		dbg(sum);
+	}
+	for(int i=1;i<=n;i++)
+		printf("%lld\n",w[m][i]);
+
+}
