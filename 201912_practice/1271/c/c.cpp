@@ -11,7 +11,7 @@ void err(T a,A... x){cout << a << ' '; err(x...);}
 #define dbg(...)
 #endif
 typedef long long ll;
-typedef pair<ll,ll> PII;
+typedef pair<int,int> PII;
 typedef vector<int> vi;
 template<class T> using vc=vector<T>;
 template<class T> using vvc=vc<vc<T>>;
@@ -33,55 +33,60 @@ void print(const vector<T>&v,int suc=1)
     for(int i=0;i<v.size();i++)
         print(v[i],i==(int)(v.size())-1?suc:2);
 }
-const ll INF=0x3f3f3f3f3f3f3f3f;
-
+const int INF=0x3f3f3f3f;
+int cnt[4];
 int main()
 {
-	int n;
-	scanf("%d",&n);
-	vector<tuple<ll,ll,ll>> all;
-	for(int i=0;i<n;i++)
+	int n,sx,sy;
+	cin>>n>>sx>>sy;
+	for(int i=0,x,y;i<n;i++)
 	{
-		ll l,r,c;
-		scanf("%lld%lld%lld",&l,&r,&c);
-		all.emplace_back(l,r,c);
-	}
-	all.emplace_back(INF,INF,INF);
-	sort(all.begin(),all.end());
-	priority_queue<PII,vector<PII>,greater<PII>> q;
-	ll cur=0,ans=0;
-	for(auto& u:all)
-	{
-		ll l,r,c;
-		tie(l,r,c)=u;
-		while(!q.empty())
+		cin>>x>>y;
+		if(x==sx)
 		{
-			ll x,R;
-			tie(x,R)=q.top();
-			if(R<=cur)
-				q.pop();
-			else if(R<=l)
+			if(y>sy) cnt[0]++;
+			else cnt[2]++;
+		}
+		else if(y==sy)
+		{
+			if(x>sx) cnt[1]++;
+			else cnt[3]++;
+		}
+		else{
+			if(x>sx&&y>sy)
 			{
-				ll ti=(R-cur)/x;
-				ans+=ti;
-				cur+=ti*x;
-				q.pop();
+				cnt[0]++;
+				cnt[1]++;
 			}
-			else{
-				ll ti=(l-cur)/x;
-				ans+=ti;
-				cur+=ti*x;
-				if(cur+x<=R)
-				{
-					q.emplace(x-(l-cur),cur+x);
-					cur=l;
-					break;
-				}
-				else q.pop();
+			else if(x>sx&&y<sy)
+			{
+				cnt[1]++;
+				cnt[2]++;
+			}
+			else if(x<sx&&y>sy)
+			{
+				cnt[0]++;
+				cnt[3]++;
+			}
+			else {
+				cnt[3]++;
+				cnt[2]++;
 			}
 		}
-		cur=l;
-		q.emplace(c,r);
 	}
-	printf("%lld\n",ans);
+	int mx=0,tar=-1;
+	for(int i=0;i<4;i++){
+		if(mx<cnt[i])
+		{
+			mx=cnt[i];
+			tar=i;
+		}
+	}
+	cout<<mx<<endl;
+	if(tar==0)
+		sy++;
+	else if(tar==1) sx++;
+	else if(tar==2) sy--;
+	else sx--;
+	cout<<sx<<" "<<sy<<endl;
 }

@@ -11,7 +11,7 @@ void err(T a,A... x){cout << a << ' '; err(x...);}
 #define dbg(...)
 #endif
 typedef long long ll;
-typedef pair<ll,ll> PII;
+typedef pair<int,int> PII;
 typedef vector<int> vi;
 template<class T> using vc=vector<T>;
 template<class T> using vvc=vc<vc<T>>;
@@ -33,55 +33,35 @@ void print(const vector<T>&v,int suc=1)
     for(int i=0;i<v.size();i++)
         print(v[i],i==(int)(v.size())-1?suc:2);
 }
-const ll INF=0x3f3f3f3f3f3f3f3f;
-
+const int INF=0x3f3f3f3f;
+unordered_map<ll,ll> cnt;
+ll org;
+ll getcnt(ll x)
+{
+	if(x>org) return 0;
+	if(cnt.count(x)) return cnt[x];
+	ll ret=0;
+	if(x&1) ret=getcnt(x*2)+1;
+	else ret=1+getcnt(x*2)+getcnt(x+1);
+	return cnt[x]=ret;
+}
 int main()
 {
-	int n;
-	scanf("%d",&n);
-	vector<tuple<ll,ll,ll>> all;
-	for(int i=0;i<n;i++)
+	ll n,k;
+	cin>>n>>k;
+	ll ans=1;
+	org=n;
+	while(n)
 	{
-		ll l,r,c;
-		scanf("%lld%lld%lld",&l,&r,&c);
-		all.emplace_back(l,r,c);
-	}
-	all.emplace_back(INF,INF,INF);
-	sort(all.begin(),all.end());
-	priority_queue<PII,vector<PII>,greater<PII>> q;
-	ll cur=0,ans=0;
-	for(auto& u:all)
-	{
-		ll l,r,c;
-		tie(l,r,c)=u;
-		while(!q.empty())
+		const int var=1;
+		for(int i=-var;i<=var;i++)
 		{
-			ll x,R;
-			tie(x,R)=q.top();
-			if(R<=cur)
-				q.pop();
-			else if(R<=l)
-			{
-				ll ti=(R-cur)/x;
-				ans+=ti;
-				cur+=ti*x;
-				q.pop();
-			}
-			else{
-				ll ti=(l-cur)/x;
-				ans+=ti;
-				cur+=ti*x;
-				if(cur+x<=R)
-				{
-					q.emplace(x-(l-cur),cur+x);
-					cur=l;
-					break;
-				}
-				else q.pop();
-			}
+			ll cur=n+i;
+			if(cur<=0||cur>org) continue;
+			ll ccc=getcnt(cur);
+			if(ccc>=k) ans=max(ans,cur);
 		}
-		cur=l;
-		q.emplace(c,r);
+		n/=2;
 	}
-	printf("%lld\n",ans);
+	cout<<ans<<endl;
 }

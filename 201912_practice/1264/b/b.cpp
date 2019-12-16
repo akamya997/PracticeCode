@@ -11,7 +11,7 @@ void err(T a,A... x){cout << a << ' '; err(x...);}
 #define dbg(...)
 #endif
 typedef long long ll;
-typedef pair<ll,ll> PII;
+typedef pair<int,int> PII;
 typedef vector<int> vi;
 template<class T> using vc=vector<T>;
 template<class T> using vvc=vc<vc<T>>;
@@ -33,55 +33,77 @@ void print(const vector<T>&v,int suc=1)
     for(int i=0;i<v.size();i++)
         print(v[i],i==(int)(v.size())-1?suc:2);
 }
-const ll INF=0x3f3f3f3f3f3f3f3f;
+const int INF=0x3f3f3f3f;
+vi ans;
+bool ok;
+void dfs(int a,int b,int c,int d)
+{
+	if(a<0||b<0||c<0||d<0) return;
+	if(!a&&!b&&!c&&!d) 
+	{
+		ok=1;
+		return;
+	}
+	if(ans.back()==0)
+	{
+		ans.push_back(1);
+		dfs(a,b-1,c,d);
+	}
+	else if(ans.back()==3)
+	{
+		ans.push_back(2);
+		dfs(a,b,c-1,d);
+	}
+	else if(ans.back()==1)
+	{
+		if(a)
+		{
+			ans.push_back(0);
+			dfs(a-1,b,c,d);
+		}
+		else {
+			ans.push_back(2);
+			dfs(a,b,c-1,d);
+		}
+	}
+	else{
+		if(d){
+			ans.push_back(3);
+			dfs(a,b,c,d-1);
+		}
+		else{
+			ans.push_back(1);
+			dfs(a,b-1,c,d);
+		}
+	}
 
+}
 int main()
 {
-	int n;
-	scanf("%d",&n);
-	vector<tuple<ll,ll,ll>> all;
-	for(int i=0;i<n;i++)
+	int a,b,c,d;
+	cin>>a>>b>>c>>d;
+	ans={0};
+	dfs(a-1,b,c,d);
+	if(!ok)
 	{
-		ll l,r,c;
-		scanf("%lld%lld%lld",&l,&r,&c);
-		all.emplace_back(l,r,c);
+		ans={1};
+		dfs(a,b-1,c,d);
 	}
-	all.emplace_back(INF,INF,INF);
-	sort(all.begin(),all.end());
-	priority_queue<PII,vector<PII>,greater<PII>> q;
-	ll cur=0,ans=0;
-	for(auto& u:all)
+	if(!ok)
 	{
-		ll l,r,c;
-		tie(l,r,c)=u;
-		while(!q.empty())
-		{
-			ll x,R;
-			tie(x,R)=q.top();
-			if(R<=cur)
-				q.pop();
-			else if(R<=l)
-			{
-				ll ti=(R-cur)/x;
-				ans+=ti;
-				cur+=ti*x;
-				q.pop();
-			}
-			else{
-				ll ti=(l-cur)/x;
-				ans+=ti;
-				cur+=ti*x;
-				if(cur+x<=R)
-				{
-					q.emplace(x-(l-cur),cur+x);
-					cur=l;
-					break;
-				}
-				else q.pop();
-			}
-		}
-		cur=l;
-		q.emplace(c,r);
+		ans={2};
+		dfs(a,b,c-1,d);
 	}
-	printf("%lld\n",ans);
+	if(!ok)
+	{
+		ans={3};
+		dfs(a,b,c,d-1);
+	}
+	if(!ok) cout<<"NO\n";
+	else{
+		cout<<"YES\n";
+		for(int i=0;i<a+b+c+d;i++)
+			cout<<ans[i]<<" ";
+		cout<<endl;
+	}
 }
